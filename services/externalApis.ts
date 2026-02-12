@@ -4,25 +4,9 @@
  * Directly provides real-time market news and stock telemetry.
  */
 
-// Safe helper to access environment variables without throwing ReferenceError
-const getSafeEnv = (key: string): string => {
-  try {
-    console.log(process.env.FINNHUB_API_KEY )
-    console.log(process.env.API_KEY )
-    // Check for process existence safely
-    if (typeof process !== 'undefined' && process.env) {
-      // Use literal access for common bundlers to replace at build time
-      if (key === 'FINNHUB_API_KEY') return process.env.FINNHUB_API_KEY 
-      if (key === 'API_KEY') return process.env.API_KEY 
-    }
-  } catch (e) {
-    // Fallback if process.env is not accessible
-  }
-  return '';
-};
 
 const getFinnhubKey = (): string => {
-  return localStorage.getItem('FINNHUB_API_KEY') || getSafeEnv('FINNHUB_API_KEY') || '';
+  return process.env.FINNHUB_API_KEY ;
 };
 
 /**
