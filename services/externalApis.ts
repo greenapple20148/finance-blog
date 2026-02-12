@@ -10,8 +10,8 @@ const getSafeEnv = (key: string): string => {
     // Check for process existence safely
     if (typeof process !== 'undefined' && process.env) {
       // Use literal access for common bundlers to replace at build time
-      if (key === 'FINNHUB_API_KEY') return process.env.FINNHUB_API_KEY || 'd63a8u1r01qnpqg0cgigd63a8u1r01qnpqg0cgj0';
-      if (key === 'API_KEY') return process.env.API_KEY || '22cb06a6-e48c-44c9-a631-aae28215a4bb';
+      if (key === 'FINNHUB_API_KEY') return process.env.FINNHUB_API_KEY 
+      if (key === 'API_KEY') return process.env.API_KEY 
     }
   } catch (e) {
     // Fallback if process.env is not accessible

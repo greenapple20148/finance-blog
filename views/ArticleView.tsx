@@ -8,7 +8,7 @@ interface ArticleViewProps {
   onBack: () => void;
 }
 
-const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack }) => {
+const ArticleView: React.FC = ({ article, onBack }) => {
   const [summary, setSummary] = useState<string>('');
   const [isSummarizing, setIsSummarizing] = useState(false);
 
@@ -50,7 +50,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack }) => {
         {/* FTC Compliance Disclosure */}
         <div className="mb-12 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed">
           <span className="text-emerald-600 dark:text-emerald-400 mr-2">Disclosure:</span>
-          FinTool is reader-supported. This article may contain affiliate links. We may earn a commission if you make a purchase at no cost to you. 
+          FinBlog is reader-supported. This article may contain affiliate links. We may earn a commission if you make a purchase at no cost to you. 
           <a href="#" className="underline ml-1">Learn more</a>.
         </div>
 

@@ -7,7 +7,7 @@ const PrivacyView: React.FC = () => {
       <header className="mb-16">
         <h1 className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-white mb-6 tracking-tighter">Privacy Policy</h1>
         <p className="text-slate-500 dark:text-slate-400 text-lg font-medium leading-relaxed">
-          How FinBlog / FinTools.tech protects your data and respects your privacy rights.
+          How FinBlog protects your data and respects your privacy rights.
         </p>
       </header>
 
@@ -18,7 +18,7 @@ const PrivacyView: React.FC = () => {
             1. Data Controller Identification
           </h2>
           <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-            The data controller for FinBlog / FinTools.tech is <strong>FinBlog Media Group</strong>. For any inquiries regarding your data, please contact us at <span className="text-emerald-600 font-bold">privacy@fintools.tech</span>.
+            The data controller for FinBlog is <strong>RZeal Solutions, Virginia</strong>. For any inquiries regarding your data, please contact us at <span className="text-emerald-600 font-bold">support@rzealinc.com</span>.
           </p>
         </section>
 
@@ -44,7 +44,7 @@ const PrivacyView: React.FC = () => {
             3. Third-Party AI Data Processing
           </h2>
           <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-            When using our AI tools, your prompts are sent to <strong>Google Gemini (Alphabet Inc.)</strong> for processing. FinBlog does not store your specific financial inputs or chat prompts on our servers for model training. Google's data handling is governed by their <a href="https://ai.google.dev/privacy" className="text-emerald-600 underline">Privacy Policy</a>.
+            When using our AI tools, your prompts are sent to <strong>Google Gemini (Alphabet Inc.)</strong> for processing. FinBlog does not store your specific financial inputs or chat prompts on our servers for model training. Google's data handling is governed by their <a href="https://ai.google.dev/privacy" className="text-emerald-600 underline" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.
           </p>
         </section>
 

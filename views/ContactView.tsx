@@ -103,11 +103,11 @@ const ContactView: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
             <div className="p-8 bg-slate-100 dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800">
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-4">Email</span>
-              <p className="font-bold text-slate-900 dark:text-white text-lg">strategy@fintools.tech</p>
+              <p className="font-bold text-slate-900 dark:text-white text-lg break-all">support@rzealinc.com</p>
             </div>
             <div className="p-8 bg-slate-100 dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800">
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-4">Location</span>
-              <p className="font-bold text-slate-900 dark:text-white text-lg">Silicon Valley, CA</p>
+              <p className="font-bold text-slate-900 dark:text-white text-lg">Virginia, USA</p>
             </div>
           </div>
 

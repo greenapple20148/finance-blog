@@ -93,7 +93,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onNavigate, isDark
               </div>
               <p className="max-w-sm mb-6 leading-relaxed font-medium">Empowering institutional and retail investors with high-fidelity capital market insights and strategic AI tools.</p>
               <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 max-w-sm border-l border-slate-700 pl-4">
-                Regulatory Compliance: FinBlog (FinTools.tech) is a registered educational media platform. We do not provide financial advice. For security disclosures, visit our <button onClick={() => onNavigate('contact')} className="underline">Security & Support</button> center.
+                Regulatory Compliance: FinBlog is a registered educational media platform operated by RZeal Solutions. We do not provide financial advice. For security disclosures, visit our <button onClick={() => onNavigate('contact')} className="underline">Security & Support</button> center.
               </div>
             </div>
             <div>
@@ -123,7 +123,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onNavigate, isDark
               <a href="https://finnhub.io" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Data by Finnhub</a>
             </div>
             <div className="text-slate-600">
-              &copy; 2024 FinBlog Media Group. All Rights Reserved.
+              &copy; 2024 RZeal Solutions. All Rights Reserved.
             </div>
           </div>
         </div>
