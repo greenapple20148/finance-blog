@@ -7,6 +7,8 @@
 // Safe helper to access environment variables without throwing ReferenceError
 const getSafeEnv = (key: string): string => {
   try {
+    console.log(process.env.FINNHUB_API_KEY )
+    console.log(process.env.API_KEY )
     // Check for process existence safely
     if (typeof process !== 'undefined' && process.env) {
       // Use literal access for common bundlers to replace at build time
