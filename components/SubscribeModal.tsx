@@ -61,7 +61,7 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
                 </span>
                 <h3 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tighter mb-4">Master Your Capital</h3>
                 <p className="text-slate-500 dark:text-slate-400 font-medium">
-                  Join 50,000+ investors receiving our weekly AI-curated market signals and tax optimization strategies.
+                  Receive our weekly AI-curated market signals and tax optimization strategies directly in your inbox.
                 </p>
               </div>
 

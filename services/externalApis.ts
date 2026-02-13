@@ -4,9 +4,23 @@
  * Directly provides real-time market news and stock telemetry.
  */
 
+// Safe helper to access environment variables without throwing ReferenceError
+const getSafeEnv = (key: string): string => {
+  try {
+    // Check for process existence safely
+    if (typeof process !== 'undefined' && process.env) {
+      // Use literal access for common bundlers to replace at build time
+      if (key === 'FINNHUB_API_KEY') return process.env.FINNHUB_API_KEY || 'd63a8u1r01qnpqg0cgigd63a8u1r01qnpqg0cgj0';
+      if (key === 'API_KEY') return process.env.API_KEY || '22cb06a6-e48c-44c9-a631-aae28215a4bb';
+    }
+  } catch (e) {
+    // Fallback if process.env is not accessible
+  }
+  return '';
+};
 
 const getFinnhubKey = (): string => {
-  return process.env.FINNHUB_API_KEY ;
+  return localStorage.getItem('FINNHUB_API_KEY') || getSafeEnv('FINNHUB_API_KEY') || '';
 };
 
 /**
@@ -44,6 +58,37 @@ export const fetchFinnhubNews = async (query: string = 'general'): Promise<Finnh
   } catch (error) {
     console.error("Failed to fetch news from Finnhub", error);
     return MOCK_FINNHUB;
+  }
+};
+
+export interface StockQuote {
+  c: number;  // Current price
+  d: number;  // Change
+  dp: number; // Percent change
+  h: number;  // High
+  l: number;  // Low
+  o: number;  // Open
+  pc: number; // Previous close
+}
+
+/**
+ * Fetches the current quote for a symbol.
+ */
+export const fetchStockQuote = async (symbol: string): Promise<StockQuote | null> => {
+  const key = getFinnhubKey();
+  if (!key) return null;
+
+  try {
+    const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${key}`);
+    const data = await response.json();
+    // Finnhub returns {c: 0, ...} for invalid symbols or empty data
+    if (data && data.c !== undefined && data.c !== 0) {
+      return data;
+    }
+    return null;
+  } catch (error) {
+    console.error(`Failed to fetch quote for ${symbol}`, error);
+    return null;
   }
 };
 

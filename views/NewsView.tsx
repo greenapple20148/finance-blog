@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { NewsItem } from '../types';
 import { fetchFinnhubNews, FinnhubNewsItem } from '../services/externalApis';
-import { summarizeArticle } from '../services/gemini';
 
 const NewsSkeleton: React.FC = () => (
   <div className="shimmer-wrapper bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col h-full">
@@ -24,10 +23,6 @@ const NewsSkeleton: React.FC = () => (
 const NewsView: React.FC = () => {
   const [combinedNews, setCombinedNews] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Summary states
-  const [summaries, setSummaries] = useState<Record<string, string>>({});
-  const [summarizingIds, setSummarizingIds] = useState<Set<string>>(new Set());
 
   const loadNews = useCallback(async (query: string = 'general') => {
     setIsLoading(true);
@@ -55,26 +50,6 @@ const NewsView: React.FC = () => {
   useEffect(() => {
     loadNews();
   }, [loadNews]);
-
-  const handleSummarize = async (item: NewsItem) => {
-    if (summaries[item.id] || summarizingIds.has(item.id)) return;
-    
-    setSummarizingIds(prev => new Set(prev).add(item.id));
-    try {
-      const summaryContent = `${item.title}\n\n${item.excerpt}`;
-      const res = await summarizeArticle(summaryContent);
-      setSummaries(prev => ({ ...prev, [item.id]: res }));
-    } catch (e) {
-      console.error("Summary failed", e);
-      setSummaries(prev => ({ ...prev, [item.id]: "Unable to generate summary at this time." }));
-    } finally {
-      setSummarizingIds(prev => {
-        const next = new Set(prev);
-        next.delete(item.id);
-        return next;
-      });
-    }
-  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12 transition-colors duration-300">
@@ -112,27 +87,9 @@ const NewsView: React.FC = () => {
                 {item.title}
               </h3>
               
-              {/* AI Summary Box */}
-              {summaries[item.id] ? (
-                <div className="mb-6 p-5 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-2xl border border-emerald-100/50 dark:border-emerald-900/30 animate-in fade-in slide-in-from-top-2 duration-500">
-                  <div className="flex items-center gap-2 mb-3 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1a1 1 0 112 0v1a1 1 0 11-2 0zM13.586 15.657l.707-.707a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414-1.414zM4.414 14.243l.707.707a1 1 0 01-1.414 1.414l-.707-.707a1 1 0 011.414-1.414z" /></svg>
-                    AI 3-Point Brief
-                  </div>
-                  <div className="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed space-y-2">
-                    {summaries[item.id].split('\n').filter(l => l.trim()).slice(0, 3).map((line, idx) => (
-                      <div key={idx} className="flex gap-2">
-                        <span className="text-emerald-500">•</span>
-                        <span>{line.replace(/^[-*•\d.]\s*/, '')}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-8 line-clamp-4 flex-grow font-medium leading-relaxed">
-                  {item.excerpt}
-                </p>
-              )}
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-8 line-clamp-4 flex-grow font-medium leading-relaxed">
+                {item.excerpt}
+              </p>
 
               <div className="flex flex-col gap-3 mt-auto pt-6 border-t border-slate-50 dark:border-slate-800">
                 <div className="flex items-center justify-between">
@@ -145,21 +102,6 @@ const NewsView: React.FC = () => {
                     Read More
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                   </a>
-                  
-                  {!summaries[item.id] && (
-                    <button 
-                      onClick={() => handleSummarize(item)}
-                      disabled={summarizingIds.has(item.id)}
-                      className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-100 dark:hover:bg-emerald-800 transition-all flex items-center gap-2 disabled:opacity-50"
-                    >
-                      {summarizingIds.has(item.id) ? (
-                        <div className="w-3 h-3 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-                      ) : (
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1a1 1 0 112 0v1a1 1 0 11-2 0zM13.586 15.657l.707-.707a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414-1.414zM4.414 14.243l.707.707a1 1 0 01-1.414 1.414l-.707-.707a1 1 0 011.414-1.414z" /></svg>
-                      )}
-                      AI Summary
-                    </button>
-                  )}
                 </div>
               </div>
             </div>

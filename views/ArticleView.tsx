@@ -1,31 +1,39 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Article } from '../types';
-import { summarizeArticle } from '../services/gemini';
 
 interface ArticleViewProps {
   article: Article;
   onBack: () => void;
 }
 
-const ArticleView: React.FC = ({ article, onBack }) => {
-  const [summary, setSummary] = useState<string>('');
-  const [isSummarizing, setIsSummarizing] = useState(false);
+const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack }) => {
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const handleSummarize = async () => {
-    if (summary) return;
-    setIsSummarizing(true);
-    try {
-      const res = await summarizeArticle(article.content);
-      setSummary(res);
-    } catch (e) {
-      setSummary("Failed to generate summary.");
-    } finally {
-      setIsSummarizing(false);
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const handleSocialShare = (platform: string) => {
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent(article.title);
+    let shareUrl = '';
+
+    if (platform === 'Twitter') {
+      shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
+    } else if (platform === 'LinkedIn') {
+      shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+    }
+
+    if (shareUrl) {
+      window.open(shareUrl, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -78,38 +86,6 @@ const ArticleView: React.FC = ({ article, onBack }) => {
           </div>
         </header>
 
-        {/* AI Summary Box */}
-        <div className="bg-slate-50 dark:bg-slate-900/50 rounded-[2.5rem] p-10 mb-16 border border-slate-100 dark:border-slate-800 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3 text-emerald-600 dark:text-emerald-400 font-black text-xs uppercase tracking-widest">
-              <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1a1 1 0 112 0v1a1 1 0 11-2 0zM13.586 15.657l.707-.707a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414-1.414zM4.414 14.243l.707.707a1 1 0 01-1.414 1.414l-.707-.707a1 1 0 011.414-1.414z" /></svg>
-              </div>
-              AI Insight Summary
-            </div>
-            {!summary && !isSummarizing && (
-              <button 
-                onClick={handleSummarize}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-600/20"
-              >
-                Generate Summary
-              </button>
-            )}
-          </div>
-          {isSummarizing ? (
-            <div className="flex items-center gap-4 text-emerald-600 dark:text-emerald-400 font-bold italic animate-pulse py-4">
-              <div className="w-5 h-5 border-3 border-emerald-600 dark:border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
-              Synthesizing core financial mechanics...
-            </div>
-          ) : summary ? (
-            <div className="prose prose-emerald dark:prose-invert text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
-              {summary.split('\n').map((line, i) => <p key={i} className="mb-4">{line}</p>)}
-            </div>
-          ) : (
-            <p className="text-slate-400 dark:text-slate-600 text-sm font-medium italic">Gemini can analyze this article and extract the most critical actionable takeaways for you in seconds.</p>
-          )}
-        </div>
-
         <div className="prose prose-xl prose-slate dark:prose-invert max-w-none text-slate-800 dark:text-slate-300 leading-[1.8] space-y-12" itemProp="articleBody">
           <div className="relative rounded-[3rem] overflow-hidden shadow-2xl mb-16 h-[500px]">
              <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" itemProp="image" />
@@ -122,11 +98,35 @@ const ArticleView: React.FC = ({ article, onBack }) => {
         <footer className="mt-24 pt-16 border-t border-slate-100 dark:border-slate-900">
           <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-10 tracking-tight">Expand the reach</h3>
           <div className="flex flex-wrap gap-4">
-            {['Twitter', 'LinkedIn', 'Copy Direct Link'].map(platform => (
-              <button key={platform} className="bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 px-8 py-4 rounded-2xl font-bold text-sm transition-all border border-slate-100 dark:border-slate-800">
-                {platform}
-              </button>
-            ))}
+            <button 
+              onClick={() => handleSocialShare('Twitter')}
+              className="bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 px-8 py-4 rounded-2xl font-bold text-sm transition-all border border-slate-100 dark:border-slate-800 flex items-center gap-2"
+            >
+              Twitter
+            </button>
+            <button 
+              onClick={() => handleSocialShare('LinkedIn')}
+              className="bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 px-8 py-4 rounded-2xl font-bold text-sm transition-all border border-slate-100 dark:border-slate-800 flex items-center gap-2"
+            >
+              LinkedIn
+            </button>
+            <button 
+              onClick={handleCopyLink}
+              className={`px-8 py-4 rounded-2xl font-bold text-sm transition-all border flex items-center gap-2 ${
+                copied 
+                ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 text-emerald-600 dark:text-emerald-400 shadow-sm' 
+                : 'bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+            >
+              <svg className={`w-4 h-4 transition-transform ${copied ? 'scale-110' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {copied ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                )}
+              </svg>
+              {copied ? 'Link Copied!' : 'Copy Direct Link'}
+            </button>
           </div>
         </footer>
       </div>

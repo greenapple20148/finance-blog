@@ -8,17 +8,6 @@ const ai = new GoogleGenAI({
   apiKey: process.env.API_KEY 
 });
 
-export const summarizeArticle = async (content: string): Promise<string> => {
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: `Please provide a concise, 3-point summary (TL;DR) of the following personal finance article: \n\n${content}`,
-    config: {
-      temperature: 0.7,
-    }
-  });
-  return response.text || "Summary unavailable.";
-};
-
 export const chatWithExpert = async (messages: Message[]): Promise<string> => {
   const history = messages.slice(0, -1).map(m => ({
     role: m.role,
