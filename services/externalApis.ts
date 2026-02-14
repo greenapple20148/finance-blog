@@ -1,7 +1,7 @@
 
 /**
- * External Data Simulation Service
- * Provides high-fidelity simulated market data and news.
+ * External Data Service
+ * Provides live market data and news using RSS feeds and simulated quotes.
  */
 
 export interface FinnhubNewsItem {
@@ -26,81 +26,63 @@ export interface StockQuote {
   pc: number; // Previous close
 }
 
+const RSS_FEED_URL = 'https://finance.yahoo.com/news/rssindex';
+const CORS_PROXY = 'https://api.allorigins.win/get?url=';
+
 /**
- * Returns simulated news items based on a preset library of financial updates.
+ * Fetches live news items from Yahoo Finance RSS via a CORS proxy.
  */
 export const fetchFinnhubNews = async (query: string = 'general'): Promise<FinnhubNewsItem[]> => {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 600));
+  try {
+    const response = await fetch(`${CORS_PROXY}${encodeURIComponent(RSS_FEED_URL)}`);
+    const data = await response.json();
+    const xmlString = data.contents;
+    
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+    const items = xmlDoc.querySelectorAll("item");
+    
+    const newsItems: FinnhubNewsItem[] = Array.from(items).map((item, index) => {
+      const title = item.querySelector("title")?.textContent || "Market Update";
+      const link = item.querySelector("link")?.textContent || "#";
+      const description = item.querySelector("description")?.textContent || "";
+      const pubDate = item.querySelector("pubDate")?.textContent || "";
+      const source = item.querySelector("source")?.textContent || "Yahoo Finance";
+      
+      // Clean up description (remove HTML if present)
+      const cleanSummary = description.replace(/<[^>]*>?/gm, '').split('. ')[0] + '.';
 
-  return [
-    {
-      category: "general",
-      datetime: Date.now() / 1000,
-      headline: "Treasury Yields Stabilize as Inflation Signals Soften",
-      id: 201,
-      image: "",
-      related: "SPY",
-      source: "CNBC",
-      summary: "Market participants are recalibrating expectations for H2 as consumer price indices show consistent cooling trends in key sectors.",
-      url: "https://www.cnbc.com/economy/"
-    },
-    {
-      category: "general",
-      datetime: Date.now() / 1000,
-      headline: "Artificial Intelligence Compute Demand Reaches New Quarterly Peak",
-      id: 202,
-      image: "",
-      related: "NVDA",
-      source: "Reuters",
-      summary: "Hyperscalers continue to accelerate infrastructure deployment, driving double-digit growth in specialized hardware procurement.",
-      url: "https://www.reuters.com/technology/"
-    },
-    {
-      category: "general",
-      datetime: Date.now() / 1000,
-      headline: "Consumer Sentiment Index Rises on Improved Labor Market Outlook",
-      id: 203,
-      image: "",
-      related: "WMT",
-      source: "Bloomberg",
-      summary: "Real-time tracking of retail transactions suggests a shift towards value-oriented spending and increased savings rates.",
-      url: "https://www.bloomberg.com/markets"
-    },
-    {
-      category: "general",
-      datetime: Date.now() / 1000,
-      headline: "Renewable Energy Infrastructure Bonds See Record Inflows",
-      id: 204,
-      image: "",
-      related: "ICLN",
-      source: "WSJ",
-      summary: "ESG-focused capital is increasingly targeting long-duration grid modernization projects following new legislative incentives.",
-      url: "https://www.wsj.com/market-data"
-    },
-    {
-      category: "general",
-      datetime: Date.now() / 1000,
-      headline: "Global Central Banks Signal Divergent Rate Paths for 2025",
-      id: 205,
-      image: "",
-      related: "QQQ",
-      source: "Financial Times",
-      summary: "Inflation dynamics in Europe vs North America lead to varying timelines for quantitative tightening measures.",
-      url: "https://www.ft.com/markets"
-    },
-    {
-      category: "general",
-      datetime: Date.now() / 1000,
-      headline: "Semiconductor Supply Chains Modernize with Localized Foundries",
-      id: 206,
-      image: "",
-      related: "TSM",
-      source: "MarketWatch",
-      summary: "The shift toward domestic production gains momentum as logistical costs and geopolitical risks reshape industrial planning.",
-      url: "https://www.marketwatch.com/latest-news"
-    }
-  ];
+      return {
+        category: "general",
+        datetime: pubDate ? new Date(pubDate).getTime() / 1000 : Date.now() / 1000,
+        headline: title,
+        id: index + 1000,
+        image: "",
+        related: "MARKET", // RSS doesn't always provide specific tickers easily
+        source: source,
+        summary: cleanSummary,
+        url: link
+      };
+    });
+
+    return newsItems;
+  } catch (e) {
+    console.error("RSS Fetch Error:", e);
+    // Fallback to static data if the live feed fails
+    return [
+      {
+        category: "general",
+        datetime: Date.now() / 1000,
+        headline: "Live Feed Interrupted: Using Cached Market Signals",
+        id: 999,
+        image: "",
+        related: "SYSTEM",
+        source: "FinBlog",
+        summary: "We are currently experiencing connectivity issues with the live news server. Market analysis remains functional.",
+        url: "#"
+      }
+    ];
+  }
 };
 
 /**
