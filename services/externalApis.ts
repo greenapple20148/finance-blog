@@ -1,122 +1,8 @@
 
 /**
- * External API Service for Finnhub.io
- * Directly provides real-time market news and stock telemetry.
+ * External Data Simulation Service
+ * Provides high-fidelity simulated market data and news.
  */
-
-// Safe helper to access environment variables without throwing ReferenceError
-const getSafeEnv = (key: string): string => {
-  try {
-    // Check for process existence safely
-    if (typeof process !== 'undefined' && process.env) {
-      // Use literal access for common bundlers to replace at build time
-      if (key === 'FINNHUB_API_KEY') return process.env.FINNHUB_API_KEY || 'd63a8u1r01qnpqg0cgigd63a8u1r01qnpqg0cgj0';
-      if (key === 'API_KEY') return process.env.API_KEY || '22cb06a6-e48c-44c9-a631-aae28215a4bb';
-    }
-  } catch (e) {
-    // Fallback if process.env is not accessible
-  }
-  return '';
-};
-
-const getFinnhubKey = (): string => {
-  return localStorage.getItem('FINNHUB_API_KEY') || getSafeEnv('FINNHUB_API_KEY') || '';
-};
-
-/**
- * Fetches news from Finnhub. Supports general categories or specific company news if query is a ticker.
- */
-export const fetchFinnhubNews = async (query: string = 'general'): Promise<FinnhubNewsItem[]> => {
-  const key = getFinnhubKey();
-  if (!key) {
-    console.warn("FINNHUB_API_KEY missing. Providing simulation data.");
-    return MOCK_FINNHUB;
-  }
-
-  const cleanQuery = query.trim().toUpperCase();
-
-  try {
-    // Check if query is a potential stock symbol (1-5 characters)
-    if (/^[A-Z1-9]{1,5}$/.test(cleanQuery)) {
-      const to = Math.floor(Date.now() / 1000);
-      const from = to - (60 * 24 * 60 * 60); // Look back 60 days for company news
-      const response = await fetch(
-        `https://finnhub.io/api/v1/company-news?symbol=${cleanQuery}&from=${from}&to=${to}&token=${key}`
-      );
-      const data = await response.json();
-      return Array.isArray(data) ? data : MOCK_FINNHUB;
-    }
-
-    // Otherwise, treat as a category or default to general
-    const validCategories = ['general', 'forex', 'crypto', 'merger'];
-    const category = validCategories.includes(query.toLowerCase()) ? query.toLowerCase() : 'general';
-    const response = await fetch(
-      `https://finnhub.io/api/v1/news?category=${category}&token=${key}`
-    );
-    const data = await response.json();
-    return Array.isArray(data) ? data : MOCK_FINNHUB;
-  } catch (error) {
-    console.error("Failed to fetch news from Finnhub", error);
-    return MOCK_FINNHUB;
-  }
-};
-
-export interface StockQuote {
-  c: number;  // Current price
-  d: number;  // Change
-  dp: number; // Percent change
-  h: number;  // High
-  l: number;  // Low
-  o: number;  // Open
-  pc: number; // Previous close
-}
-
-/**
- * Fetches the current quote for a symbol.
- */
-export const fetchStockQuote = async (symbol: string): Promise<StockQuote | null> => {
-  const key = getFinnhubKey();
-  if (!key) return null;
-
-  try {
-    const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${key}`);
-    const data = await response.json();
-    // Finnhub returns {c: 0, ...} for invalid symbols or empty data
-    if (data && data.c !== undefined && data.c !== 0) {
-      return data;
-    }
-    return null;
-  } catch (error) {
-    console.error(`Failed to fetch quote for ${symbol}`, error);
-    return null;
-  }
-};
-
-export const fetchStockHistory = async (ticker: string): Promise<number[]> => {
-  const key = getFinnhubKey();
-  if (!key) {
-    const seed = ticker.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return Array.from({ length: 7 }, (_, i) => 150 + Math.sin(seed + i) * 10 + (i * 2));
-  }
-
-  try {
-    const to = Math.floor(Date.now() / 1000);
-    const from = to - (7 * 24 * 60 * 60); 
-    
-    const response = await fetch(
-      `https://finnhub.io/api/v1/stock/candle?symbol=${ticker}&resolution=D&from=${from}&to=${to}&token=${key}`
-    );
-    const data = await response.json();
-    
-    if (data.s === 'ok' && Array.isArray(data.c)) {
-      return data.c; 
-    }
-    return [];
-  } catch (error) {
-    console.error(`Failed to fetch stock data for ${ticker}`, error);
-    return [];
-  }
-};
 
 export interface FinnhubNewsItem {
   category: string;
@@ -130,27 +16,100 @@ export interface FinnhubNewsItem {
   url: string;
 }
 
-const MOCK_FINNHUB: FinnhubNewsItem[] = [
-  {
-    category: "general",
-    datetime: Date.now() / 1000,
-    headline: "Tesla Expands Gigafactory Production in Europe",
-    id: 101,
-    image: "",
-    related: "TSLA",
-    source: "Finnhub Analytics",
-    summary: "Production capacity is expected to increase by 20% by the end of the fiscal year, boosting local delivery speed.",
-    url: "https://example.com/tsla-news"
-  },
-  {
-    category: "general",
-    datetime: Date.now() / 1000,
-    headline: "Global Semiconductor Supply Stabilizes After Two Years",
-    id: 102,
-    image: "",
-    related: "NVDA",
-    source: "Tech Finance",
-    summary: "New manufacturing plants in Ohio and Arizona are beginning to output significant volume for the automotive industry.",
-    url: "https://example.com/semi-news"
-  }
-];
+export interface StockQuote {
+  c: number;  // Current price
+  d: number;  // Change
+  dp: number; // Percent change
+  h: number;  // High
+  l: number;  // Low
+  o: number;  // Open
+  pc: number; // Previous close
+}
+
+/**
+ * Returns simulated news items based on a preset library of financial updates.
+ */
+export const fetchFinnhubNews = async (query: string = 'general'): Promise<FinnhubNewsItem[]> => {
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 600));
+
+  return [
+    {
+      category: "general",
+      datetime: Date.now() / 1000,
+      headline: "Treasury Yields Stabilize as Inflation Signals Soften",
+      id: 201,
+      image: "",
+      related: "SPY",
+      source: "FinBlog Terminal",
+      summary: "Market participants are recalibrating expectations for H2 as consumer price indices show consistent cooling trends in key sectors.",
+      url: "#"
+    },
+    {
+      category: "general",
+      datetime: Date.now() / 1000,
+      headline: "Artificial Intelligence Compute Demand Reaches New Quarterly Peak",
+      id: 202,
+      image: "",
+      related: "NVDA",
+      source: "FinBlog Terminal",
+      summary: "Hyperscalers continue to accelerate infrastructure deployment, driving double-digit growth in specialized hardware procurement.",
+      url: "#"
+    },
+    {
+      category: "general",
+      datetime: Date.now() / 1000,
+      headline: "Consumer Sentiment Index Rises on Improved Labor Market Outlook",
+      id: 203,
+      image: "",
+      related: "WMT",
+      source: "FinBlog Terminal",
+      summary: "Real-time tracking of retail transactions suggests a shift towards value-oriented spending and increased savings rates.",
+      url: "#"
+    },
+    {
+      category: "general",
+      datetime: Date.now() / 1000,
+      headline: "Renewable Energy Infrastructure Bonds See Record Inflows",
+      id: 204,
+      image: "",
+      related: "ICLN",
+      source: "FinBlog Terminal",
+      summary: "ESG-focused capital is increasingly targeting long-duration grid modernization projects following new legislative incentives.",
+      url: "#"
+    }
+  ];
+};
+
+/**
+ * Returns a simulated quote for a symbol.
+ */
+export const fetchStockQuote = async (symbol: string): Promise<StockQuote | null> => {
+  const seed = symbol.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const basePrice = (seed % 500) + 50;
+  const vol = (seed % 10) / 100; // 0-10% volatility
+  
+  const currentPrice = basePrice + (Math.random() * basePrice * vol);
+  const prevClose = basePrice;
+  const change = currentPrice - prevClose;
+  const percentChange = (change / prevClose) * 100;
+
+  return {
+    c: currentPrice,
+    d: change,
+    dp: percentChange,
+    h: currentPrice * 1.02,
+    l: currentPrice * 0.98,
+    o: prevClose,
+    pc: prevClose
+  };
+};
+
+/**
+ * Returns simulated 7-day price history.
+ */
+export const fetchStockHistory = async (ticker: string): Promise<number[]> => {
+  const seed = ticker.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const base = 150 + (seed % 200);
+  return Array.from({ length: 7 }, (_, i) => base + Math.sin(seed + i) * 10 + (i * 2));
+};

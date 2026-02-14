@@ -3,10 +3,24 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { Message, BudgetItem, NewsItem, DebtItem } from "../types";
 
 // Always use const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
-// MUST NOT use fallback logic for the API key.
 const ai = new GoogleGenAI({ 
   apiKey: process.env.API_KEY 
 });
+
+export const getMarketSentiment = async (ticker: string, price: number, change: number): Promise<string> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: `Provide a 1-2 word market sentiment tag for ${ticker} currently trading at $${price} (${change > 0 ? '+' : ''}${change}%). Examples: BULLISH, OVERBOUGHT, ACCUMULATING, BEARISH, VOLATILE, NEUTRAL. Return ONLY the words.`,
+      config: {
+        temperature: 0.4,
+      }
+    });
+    return (response.text || "NEUTRAL").trim().toUpperCase();
+  } catch (e) {
+    return "STABLE";
+  }
+};
 
 export const chatWithExpert = async (messages: Message[]): Promise<string> => {
   const history = messages.slice(0, -1).map(m => ({

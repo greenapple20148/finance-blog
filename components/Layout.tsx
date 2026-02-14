@@ -122,7 +122,6 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onNavigate, isDark
               <button onClick={() => onNavigate('tos')} className="hover:text-white transition-colors">TOS</button>
               <button onClick={() => onNavigate('privacy')} className="hover:text-white transition-colors">Privacy</button>
               <button onClick={() => onNavigate('disclaimer')} className="hover:text-white transition-colors">Disclosures</button>
-              <a href="https://finnhub.io" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Data by Finnhub</a>
             </div>
             <div className="text-slate-600">
               &copy; 2024 RZeal Solutions. All Rights Reserved.
