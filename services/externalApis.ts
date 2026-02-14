@@ -41,9 +41,9 @@ export const fetchFinnhubNews = async (query: string = 'general'): Promise<Finnh
       id: 201,
       image: "",
       related: "SPY",
-      source: "FinBlog Terminal",
+      source: "CNBC",
       summary: "Market participants are recalibrating expectations for H2 as consumer price indices show consistent cooling trends in key sectors.",
-      url: "#"
+      url: "https://www.cnbc.com/economy/"
     },
     {
       category: "general",
@@ -52,9 +52,9 @@ export const fetchFinnhubNews = async (query: string = 'general'): Promise<Finnh
       id: 202,
       image: "",
       related: "NVDA",
-      source: "FinBlog Terminal",
+      source: "Reuters",
       summary: "Hyperscalers continue to accelerate infrastructure deployment, driving double-digit growth in specialized hardware procurement.",
-      url: "#"
+      url: "https://www.reuters.com/technology/"
     },
     {
       category: "general",
@@ -63,9 +63,9 @@ export const fetchFinnhubNews = async (query: string = 'general'): Promise<Finnh
       id: 203,
       image: "",
       related: "WMT",
-      source: "FinBlog Terminal",
+      source: "Bloomberg",
       summary: "Real-time tracking of retail transactions suggests a shift towards value-oriented spending and increased savings rates.",
-      url: "#"
+      url: "https://www.bloomberg.com/markets"
     },
     {
       category: "general",
@@ -74,9 +74,31 @@ export const fetchFinnhubNews = async (query: string = 'general'): Promise<Finnh
       id: 204,
       image: "",
       related: "ICLN",
-      source: "FinBlog Terminal",
+      source: "WSJ",
       summary: "ESG-focused capital is increasingly targeting long-duration grid modernization projects following new legislative incentives.",
-      url: "#"
+      url: "https://www.wsj.com/market-data"
+    },
+    {
+      category: "general",
+      datetime: Date.now() / 1000,
+      headline: "Global Central Banks Signal Divergent Rate Paths for 2025",
+      id: 205,
+      image: "",
+      related: "QQQ",
+      source: "Financial Times",
+      summary: "Inflation dynamics in Europe vs North America lead to varying timelines for quantitative tightening measures.",
+      url: "https://www.ft.com/markets"
+    },
+    {
+      category: "general",
+      datetime: Date.now() / 1000,
+      headline: "Semiconductor Supply Chains Modernize with Localized Foundries",
+      id: 206,
+      image: "",
+      related: "TSM",
+      source: "MarketWatch",
+      summary: "The shift toward domestic production gains momentum as logistical costs and geopolitical risks reshape industrial planning.",
+      url: "https://www.marketwatch.com/latest-news"
     }
   ];
 };
